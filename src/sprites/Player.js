@@ -48,7 +48,17 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.upKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
     this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
     this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
-    console.log(this)
+
+    scene.make.text({
+      x: 0,
+      y: 0,
+      text: 'Game00\n-',
+      style: {
+        font: '48px Arial',
+        fill: '#ff00ff',
+        align: 'center'
+      }
+    })
 
     config.scene.add.existing(this)
   }
