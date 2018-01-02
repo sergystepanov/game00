@@ -2,32 +2,34 @@ export default class Player extends Phaser.GameObjects.Sprite {
   constructor(config) {
     const { scene, x, y, key } = config
 
-    super(scene, x, y, key)
+    super(scene, x, y, key);
+
+    const FRAME_RATE = 12;
 
     const playerFrames = scene.anims.generateFrameNumbers('player')
     const animationConfig = {
       walkDown: {
         key: 'playerWalkDown',
         frames: playerFrames.slice(0, 4),
-        frameRate: 6,
+        frameRate: FRAME_RATE,
         repeat: -1
       },
       walkUp: {
         key: 'playerWalkUp',
         frames: playerFrames.slice(34, 38),
-        frameRate: 6,
+        frameRate: FRAME_RATE,
         repeat: -1
       },
       walkLeft: {
         key: 'playerWalkLeft',
         frames: playerFrames.slice(51, 55),
-        frameRate: 6,
+        frameRate: FRAME_RATE,
         repeat: -1
       },
       walkRight: {
         key: 'playerWalkRight',
         frames: playerFrames.slice(17, 21),
-        frameRate: 6,
+        frameRate: FRAME_RATE,
         repeat: -1
       }
     }

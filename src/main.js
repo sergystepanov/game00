@@ -5,7 +5,7 @@ import PlayerScene from './scenes/examples/PlayerScene'
 
 const { innerWidth: ww, innerHeight: wh } = window;
 
-new Phaser.Game({
+const GAME = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'content',
   width: ww,
@@ -14,4 +14,4 @@ new Phaser.Game({
     BootScene,
     PlayerScene
   ]
-})
+});

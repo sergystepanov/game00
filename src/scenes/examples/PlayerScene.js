@@ -1,4 +1,4 @@
-import Player from '../../sprites/Player'
+import Player from '../../sprites/player/Player';
 
 class PlayerScene extends Phaser.Scene {
   constructor() {
