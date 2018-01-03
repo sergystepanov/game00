@@ -7,6 +7,10 @@ class PlayerScene extends Phaser.Scene {
     this.player = null
   }
 
+  preload() {
+    this.load.atlas('player', './assets/images/character.png', './assets/images/character.json');
+  }
+
   create() {
     this.player = new Player({
       scene: this,
