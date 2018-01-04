@@ -37,6 +37,24 @@ export default class Player extends Phaser.GameObjects.Sprite {
         frames: scene.anims.generateFrameNames('player', { prefix: 'swing_down_', end: 4, zeroPad: 4 }),
         frameRate: SETTINGS.FRAME_RATE,
         repeat: -1
+      },
+      swingUp: {
+        key: 'swing_up',
+        frames: scene.anims.generateFrameNames('player', { prefix: 'swing_up_', end: 4, zeroPad: 4 }),
+        frameRate: SETTINGS.FRAME_RATE,
+        repeat: -1
+      },
+      swingLeft: {
+        key: 'swing_left',
+        frames: scene.anims.generateFrameNames('player', { prefix: 'swing_left_', end: 4, zeroPad: 4 }),
+        frameRate: SETTINGS.FRAME_RATE,
+        repeat: -1
+      },
+      swingRight: {
+        key: 'swing_right',
+        frames: scene.anims.generateFrameNames('player', { prefix: 'swing_right_', end: 4, zeroPad: 4 }),
+        frameRate: SETTINGS.FRAME_RATE,
+        repeat: -1
       }
     };
 
@@ -44,63 +62,8 @@ export default class Player extends Phaser.GameObjects.Sprite {
       scene.anims.create(animationConfig[key]);
     });
 
-
-    // console.log(scene.anims.generateFrameNumbers('player', { frames: [0, 1, 2, 3] }));
-    // const animationConfig = {
-    //   walkDown: {
-    //     key: 'playerWalkDown',
-    //     frames: scene.anims.generateFrameNumbers('walk_down', { frames: [0, 1, 2, 3] }),
-    //     frameRate: FRAME_RATE,
-    //     repeat: -1
-    //   }
-    // };
-    //   walkUp: {
-    //     key: 'playerWalkUp',
-    //     frames: playerFrames.slice(34, 38),
-    //     frameRate: FRAME_RATE,
-    //     repeat: -1
-    //   },
-    //   walkLeft: {
-    //     key: 'playerWalkLeft',
-    //     frames: playerFrames.slice(51, 55),
-    //     frameRate: FRAME_RATE,
-    //     repeat: -1
-    //   },
-    //   walkRight: {
-    //     key: 'playerWalkRight',
-    //     frames: playerFrames.slice(17, 21),
-    //     frameRate: FRAME_RATE,
-    //     repeat: -1
-    //   },
-    //   swingUp: {
-    //     key: 'playerSwingUp',
-    //     frames: playerFrames.slice(0, 135),
-    //     frameRate: FRAME_RATE,
-    //     repeat: -1
-    //   }
-    // }
-
-    // const p = scene.add.sprite(330, 100, 'player');
-    // p.anims.add('swim', p.anims.generateFrameNames('walk_down', 0, 3, '', 4), 30, true);
-    // p.anims.play('swim');
-
-    // const walkDownAnimations = scene.anims.generateFrameNames('player');
-    // console.log(walkDownAnimations);
-    // scene.anims.add('walk_down', scene.anims.generateFrameNames('walk_down', 1, 4), 4, true);
-
-    // scene.anims.create('walk_down')
-    // scene.anims.create(animationConfig.walkUp)
-    // scene.anims.create(animationConfig.walkLeft)
-    // scene.anims.create(animationConfig.walkRight)
-    // scene.anims.create(animationConfig.swingUp);
-
-    // this.anims.load('walk_down')
-    // this.anims.load('playerWalkLeft')
-    // this.anims.load('playerWalkRight')
-    // this.anims.load('playerSwingUp')
-    // this.anims.load('playerWalkDown')
-    // this.scaleX = 2
-    // this.scaleY = 2
+    this.scaleX = 2
+    this.scaleY = 2
 
     this.setInteractive()
     this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
@@ -120,28 +83,51 @@ export default class Player extends Phaser.GameObjects.Sprite {
       }
     })
 
+    this.lastAnimation = null;
+
     config.scene.add.existing(this)
   }
 
   update() {
     if (this.downKey.isDown) {
       this.y += 5
-      this.anims.play('walk_down', true)
+      this.anims.play('walk_down', true);
+      this.lastAnimation = this.anims.currentAnim;
     } else if (this.upKey.isDown) {
       this.y -= 5
       this.anims.play('walk_up', true)
+      this.lastAnimation = this.anims.currentAnim;
     } else if (this.leftKey.isDown) {
       this.x -= 5
       this.anims.play('walk_left', true)
+      this.lastAnimation = this.anims.currentAnim;
     } else if (this.rightKey.isDown) {
       this.x += 5
       this.anims.play('walk_right', true)
+      this.lastAnimation = this.anims.currentAnim;
+      // An attack animation
     } else if (this.spaceKey.isDown) {
-      this.anims.play('swing_down', true);
+      // Get last player's facing direction for a swing
+      const lastKey = this.lastAnimation ? this.lastAnimation.key : 'walk_down';
+      const name = lastKey.split('_');
+
+      // Swing in that direction
+      this.anims.play(`swing_${name[1]}`, true);
     }
 
-    if (this.downKey.isUp && this.upKey.isUp && this.leftKey.isUp && this.rightKey.isUp && this.spaceKey.isUp) {
-      this.anims.stop()
+    if (this.downKey.isUp && this.upKey.isUp && this.leftKey.isUp && this.rightKey.isUp) {
+      // Continue the swing animation
+      if (this.anims.currentAnim && this.anims.currentAnim.key.startsWith('swing_') &&
+        this.anims.currentFrame && !this.anims.currentFrame.isLast) {
+        return;
+      }
+
+      // Reset to the initial facing position
+      if (this.lastAnimation) {
+        this.anims.play(this.lastAnimation.key, false);
+      }
+
+      this.anims.stop();
     }
   }
 }
