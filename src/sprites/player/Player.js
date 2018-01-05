@@ -90,19 +90,19 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
   update() {
     if (this.downKey.isDown) {
-      this.y += 5
+      this.y += SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_down', true);
       this.lastAnimation = this.anims.currentAnim;
     } else if (this.upKey.isDown) {
-      this.y -= 5
+      this.y -= SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_up', true)
       this.lastAnimation = this.anims.currentAnim;
     } else if (this.leftKey.isDown) {
-      this.x -= 5
+      this.x -= SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_left', true)
       this.lastAnimation = this.anims.currentAnim;
     } else if (this.rightKey.isDown) {
-      this.x += 5
+      this.x += SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_right', true)
       this.lastAnimation = this.anims.currentAnim;
       // An attack animation
