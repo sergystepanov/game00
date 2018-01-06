@@ -20,7 +20,6 @@ class PlayerScene extends Phaser.Scene {
     })
     this.player.scaleX = 4
     this.player.scaleY = 4
-    this.player.scaleMode = 2
   }
 
   update() {

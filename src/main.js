@@ -13,5 +13,6 @@ const GAME = new Phaser.Game({
   scene: [
     BootScene,
     PlayerScene
-  ]
+  ],
+  pixelArt: true
 });
