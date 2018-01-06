@@ -65,12 +65,24 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.scaleX = 2
     this.scaleY = 2
 
-    this.setInteractive()
-    this.downKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
-    this.upKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
-    this.leftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
-    this.rightKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
-    this.spaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+    this.setInteractive();
+
+    this.playerMatrix =
+      [0, -1, 0,
+        -1, 0, 1,
+        0, 1, 0];
+
+    const me = this;
+
+    // Input keys binding
+    this.gameKeys = { special: ['SPACE'], attack: ['W', 'A', 'S', 'D'], move: ['UP', 'DOWN', 'LEFT', 'RIGHT'] };
+    this.pollingKeys = ['W', 'A', 'S', 'D', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE'];
+
+    Object.keys(this.gameKeys).forEach(key => {
+      this.gameKeys[key].forEach(inputKey => {
+        me[`key${inputKey}`] = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[inputKey]);
+      });
+    });
 
     scene.make.text({
       x: 0,
@@ -89,33 +101,44 @@ export default class Player extends Phaser.GameObjects.Sprite {
   }
 
   update() {
-    if (this.downKey.isDown) {
+    // An old un-closure method for this
+    const me = this;
+
+    if (this.keyDOWN.isDown) {
       this.y += SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_down', true);
       this.lastAnimation = this.anims.currentAnim;
-    } else if (this.upKey.isDown) {
+    } else if (this.keyUP.isDown) {
       this.y -= SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_up', true)
       this.lastAnimation = this.anims.currentAnim;
-    } else if (this.leftKey.isDown) {
+    } else if (this.keyLEFT.isDown) {
       this.x -= SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_left', true)
       this.lastAnimation = this.anims.currentAnim;
-    } else if (this.rightKey.isDown) {
+    } else if (this.keyRIGHT.isDown) {
       this.x += SETTINGS.DEFAULT_SPEED;
       this.anims.play('walk_right', true)
       this.lastAnimation = this.anims.currentAnim;
-      // An attack animation
-    } else if (this.spaceKey.isDown) {
-      // Get last player's facing direction for a swing
-      const lastKey = this.lastAnimation ? this.lastAnimation.key : 'walk_down';
-      const name = lastKey.split('_');
-
-      // Swing in that direction
-      this.anims.play(`swing_${name[1]}`, true);
+    } else {
+      const attack = this.gameKeys.attack.find(key => me[`key${key}`].isDown);
+      if (attack) {
+        this.anims.play('swing_' + { W: 'up', A: 'left', S: 'down', D: 'right' }[attack], true);
+      }
     }
+    // An attack animation
+    // } else if (this.keySPACE.isDown) {
+    //   // Get last player's facing direction for a swing
+    //   const lastKey = this.lastAnimation ? this.lastAnimation.key : 'walk_down';
+    //   const name = lastKey.split('_');
 
-    if (this.downKey.isUp && this.upKey.isUp && this.leftKey.isUp && this.rightKey.isUp) {
+    //   // Swing in that direction
+    //   this.anims.play(`swing_${name[1]}`, true);
+    // }
+
+    const allUp = this.pollingKeys.reduce((acc, value) => { return acc && me[`key${value}`].isUp }, true)
+
+    if (allUp) {
       // Continue the swing animation
       if (this.anims.currentAnim && this.anims.currentAnim.key.startsWith('swing_') &&
         this.anims.currentFrame && !this.anims.currentFrame.isLast) {
