@@ -67,10 +67,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     this.setInteractive();
 
-    this.playerMatrix =
-      [0, -1, 0,
-        -1, 0, 1,
-        0, 1, 0];
+    this.playerMatrix = [-1, 1, -1, 1];
 
     const me = this;
 
@@ -104,26 +101,33 @@ export default class Player extends Phaser.GameObjects.Sprite {
     // An old un-closure method for this
     const me = this;
 
-    if (this.keyDOWN.isDown) {
-      this.y += SETTINGS.DEFAULT_SPEED;
-      this.anims.play('walk_down', true);
-      this.lastAnimation = this.anims.currentAnim;
-    } else if (this.keyUP.isDown) {
-      this.y -= SETTINGS.DEFAULT_SPEED;
-      this.anims.play('walk_up', true)
-      this.lastAnimation = this.anims.currentAnim;
-    } else if (this.keyLEFT.isDown) {
-      this.x -= SETTINGS.DEFAULT_SPEED;
-      this.anims.play('walk_left', true)
-      this.lastAnimation = this.anims.currentAnim;
-    } else if (this.keyRIGHT.isDown) {
-      this.x += SETTINGS.DEFAULT_SPEED;
-      this.anims.play('walk_right', true)
-      this.lastAnimation = this.anims.currentAnim;
+    const walk = this.gameKeys.move.find(key => me[`key${key}`].isDown);
+    if (walk) {
+      const vector = { UP: -1, DOWN: 1, LEFT: -1, RIGHT: 1 }[walk];
+
+      const SPEE = (Math.random() * (1 - 2) + 1);
+
+      if (walk === 'DOWN' || walk === 'UP') {
+        this.y = this.y + vector * (SETTINGS.DEFAULT_SPEED + SPEE);
+      } else {
+        if (walk === 'LEFT' || walk === 'RIGHT') {
+          this.x = this.x + vector * (SETTINGS.DEFAULT_SPEED + SPEE);
+        }
+      }
+
+      this.anims.play(`walk_${walk.toLowerCase()}`, true);
+
+      this.lastAnimation = walk;
     } else {
       const attack = this.gameKeys.attack.find(key => me[`key${key}`].isDown);
       if (attack) {
-        this.anims.play('swing_' + { W: 'up', A: 'left', S: 'down', D: 'right' }[attack], true);
+        const swingDirection = { W: 'up', A: 'left', S: 'down', D: 'right' }[attack];
+        this.anims.play(`swing_${swingDirection}`, true);
+        // Get last player's facing direction for a swing
+        // const lastKey = this.lastAnimation ? this.lastAnimation.key : 'walk_down';
+        this.lastAnimation = swingDirection;
+
+        // this.anims.play(lastKey, true);
       }
     }
     // An attack animation
@@ -147,7 +151,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
       // Reset to the initial facing position
       if (this.lastAnimation) {
-        this.anims.play(this.lastAnimation.key, false);
+        this.anims.play(`walk_${this.lastAnimation.toLowerCase()}`, false);
       }
 
       this.anims.stop();
